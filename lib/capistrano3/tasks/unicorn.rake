@@ -1,5 +1,6 @@
 namespace :load do
   task :defaults do
+    set :unicorn_start_path, -> { current_path }
     set :unicorn_pid, -> { File.join(current_path, "tmp", "pids", "unicorn.pid") }
     set :unicorn_config_path, -> { File.join(current_path, "config", "unicorn", "#{fetch(:rails_env)}.rb") }
     set :unicorn_roles, -> { :app }
@@ -13,7 +14,7 @@ namespace :unicorn do
   desc "Start Unicorn"
   task :start do
     on roles(fetch(:unicorn_roles)) do
-      within current_path do
+      within fetch(:unicorn_start_path) do
         if test("[ -e #{fetch(:unicorn_pid)} ] && kill -0 #{pid}")
           info "unicorn is running..."
         else
